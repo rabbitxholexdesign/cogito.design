@@ -1,11 +1,10 @@
 import Link from "next/link"
-import { redirect } from "next/navigation"
-import { LayoutDashboard, ImageIcon, BookOpen, Mail, LogOut, ExternalLink } from "lucide-react"
+import { LayoutDashboard, ImageIcon, BookOpen, Mail, ExternalLink } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { AdminLogoutButton } from "./logout-button"
 
 const navItems = [
-  { href: "/admin", label: "ダッシュボード", icon: LayoutDashboard, exact: true },
+  { href: "/admin", label: "ダッシュボード", icon: LayoutDashboard },
   { href: "/admin/works", label: "Works", icon: ImageIcon },
   { href: "/admin/blog", label: "Blog", icon: BookOpen },
   { href: "/admin/contacts", label: "お問い合わせ", icon: Mail },
@@ -19,8 +18,10 @@ export default async function AdminLayout({
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  // 未認証の場合はサイドバーなしでそのまま children を表示
+  // （認証チェック・リダイレクトは proxy.ts が担当）
   if (!user) {
-    redirect("/admin/login")
+    return <>{children}</>
   }
 
   return (
